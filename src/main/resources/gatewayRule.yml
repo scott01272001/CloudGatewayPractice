@@ -1,0 +1,17 @@
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator: TRACE
+    org.springframework.cloud.gateway: TRACE
+
+#spring:
+#  cloud:
+#    gateway:
+#      routes:
+#        - id: test_route
+#          uri: http://localhost:1234/
+#          predicates:
+#            - Path=/webflux/**
+#          filters:
+#            - AddRequestHeader=X-Request-red, blue
+#            - AddResponseHeader=X-Response-Red, Blue
