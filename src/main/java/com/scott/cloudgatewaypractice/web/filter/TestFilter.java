@@ -1,4 +1,4 @@
-package com.scott.cloudgatewaypractice.web.controller.web.filter;
+package com.scott.cloudgatewaypractice.web.filter;
 
 import lombok.extern.log4j.Log4j2;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;

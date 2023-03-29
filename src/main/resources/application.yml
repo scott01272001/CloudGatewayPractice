@@ -25,3 +25,8 @@ spring:
 
 server:
   port: 1234
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web.server: TRACE
