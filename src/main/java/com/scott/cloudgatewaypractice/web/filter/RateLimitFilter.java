@@ -7,6 +7,7 @@ import com.google.common.util.concurrent.RateLimiter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -23,13 +24,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@Component
 @Log4j2
+@Component
+//@Order(1)
 public class RateLimitFilter implements WebFilter {
 
-    private double authRequestPerSecond = 0.25;
+    @Value("${server.auth-requests-per-second-per-client}")
+    private double authRequestPerSecond;
 
-    private double requestPerSecondPerClient = 100;
+    @Value("${server.requests-per-second-per-client}")
+    private double requestPerSecondPerClient;
 
     private LoadingCache<String, RateLimiter> limiterCache;
 

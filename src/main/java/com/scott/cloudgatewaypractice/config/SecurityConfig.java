@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -26,30 +27,18 @@ import reactor.core.publisher.Mono;
 import java.util.Optional;
 
 @EnableWebFluxSecurity
-@Configuration
 @RequiredArgsConstructor
 @Log4j2
+@Configuration
 public class SecurityConfig {
 
+//    @Bean
+//    public JwtSecurityFilter jwtSecurityFilter() {
+//        return new JwtSecurityFilter();
+//    }
     private final UserRepository userRepository;
-    private final JwtSecurityFilter jwtFilter;
 
-    private final RateLimitFilter rateLimitFilter;
-
-    @Bean
-    public MapReactiveUserDetailsService userDetailsService() {
-        UserDetails user = User.withDefaultPasswordEncoder()
-                .username("user")
-                .password("user").passwordEncoder(p -> passwordEncoder().encode(p))
-                .roles("USER")
-                .build();
-        UserDetails admin = User.withDefaultPasswordEncoder()
-                .username("admin")
-                .password("admin")
-                .roles("ADMIN")
-                .build();
-        return new MapReactiveUserDetailsService(user, admin);
-    }
+   // private final JwtSecurityFilter jwtSecurityFilter;
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
@@ -57,21 +46,21 @@ public class SecurityConfig {
         http = http.securityContextRepository(NoOpServerSecurityContextRepository.getInstance());
 
         http.exceptionHandling().authenticationEntryPoint((exchange, ex) -> {
-
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             Flux body = Flux.just(exchange.getResponse().bufferFactory().wrap(ex.getMessage().getBytes()));
             return exchange.getResponse().writeWith(body);
         });
 
-        http = http.authorizeExchange()
-                .pathMatchers("/basic/**").authenticated().and().httpBasic().and();
+        http = http.authorizeExchange().pathMatchers("/auth/**").permitAll().and();
 
-        http = http.authorizeExchange().pathMatchers("/api/**").authenticated().and();
+        http = http.authorizeExchange().pathMatchers("/api/**").authenticated().and().httpBasic().and();
+
+        http = http.authorizeExchange().pathMatchers("/redirect/**").permitAll().and();
 
         http = http.authenticationManager(authenticationManager(passwordEncoder()));
 
-//        http.addFilterBefore(rateLimitFilter, SecurityWebFiltersOrder.HTTP_BASIC);
-        http.addFilterBefore(jwtFilter, SecurityWebFiltersOrder.HTTP_BASIC);
+//        http.addFilterBefore(new RateLimitFilter(), SecurityWebFiltersOrder.HTTP_BASIC);
+      //  http.addFilterBefore(jwtSecurityFilter, SecurityWebFiltersOrder.HTTP_BASIC);
 
         return http.build();
     }
@@ -90,8 +79,6 @@ public class SecurityConfig {
                 log.info("basic auth user name: {}", authentication.getName());
 
                 Optional<com.scott.cloudgatewaypractice.dao.User> user = userRepository.findByEmail(authentication.getName());
-
-                //Mono<UserDetails> user = userDetailsService().findByUsername(authentication.getName());
 
                 if (!user.isPresent()) {
                     return Mono.error(new UsernameNotFoundException("User not found"));

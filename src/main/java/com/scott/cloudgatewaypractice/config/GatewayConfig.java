@@ -1,5 +1,6 @@
 package com.scott.cloudgatewaypractice.config;
 
+import com.scott.cloudgatewaypractice.web.filter.PostFilter;
 import com.scott.cloudgatewaypractice.web.filter.TestFilter;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.context.annotation.Bean;
@@ -13,4 +14,8 @@ public class GatewayConfig {
         return new TestFilter();
     }
 
+    @Bean
+    public GlobalFilter addPostFilter() {
+        return new PostFilter();
+    }
 }

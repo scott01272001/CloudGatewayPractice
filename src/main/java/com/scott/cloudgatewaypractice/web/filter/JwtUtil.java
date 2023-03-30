@@ -12,6 +12,10 @@ import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.UUID;
 
@@ -46,6 +50,17 @@ public class JwtUtil {
             // generate a uuid which invalid after restart
             serverHashId = UUID.randomUUID().toString();
         }
+    }
+
+    public static String generateToken(String name, Duration duration) {
+        return JWT.create() //
+                .withSubject(name) //
+                .withAudience(AUDIENCE_ACCESS) //
+                .withIssuer(serverHashId) //
+                .withIssuedAt(new Date()) //
+                .withExpiresAt(Date.from(Instant.now().plusSeconds(duration.getSeconds()))) //
+                .withClaim("scope", Arrays.asList()) //
+                .sign(algorithm());
     }
 
     public static DecodedJWT decodeToken(String token) {

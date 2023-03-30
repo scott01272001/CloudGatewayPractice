@@ -7,13 +7,11 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 @Log4j2
-public class TestFilter implements GlobalFilter {
-
+public class PostFilter implements GlobalFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        log.info("Test Filter call!!!");
-        log.info("header {}", exchange.getRequest().getHeaders());
-        return chain.filter(exchange);
+        return chain.filter(exchange).then(Mono.fromRunnable( () -> {
+            log.info("post filter");
+        } ));
     }
-
 }

@@ -21,12 +21,14 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
   config:
-    import: classpath:gatewayRule.yml
+    import: classpath:gatewayRule.yml,classpath:config.properties
 
 server:
-  port: 1234
+  port: ${testPort}
 
-logging:
-  level:
-    root: INFO
-    org.springframework.web.server: TRACE
+#logging:
+#  level:
+#    reactor:
+#      netty:
+#        http:
+#          client: DEBUG
